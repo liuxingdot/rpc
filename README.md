@@ -18,16 +18,13 @@
 ##
 ### 2. 自定义协议以及序列化接口
 在传输过程中，我们可以在发送的数据上加上各种必要的数据，形成自定义的协议，而自动加上这个数据就是编码器的工作，解析数据获得原始数据就是解码器的工作。
-##
 协议格式：
-+---------------+---------------+-----------------+-------------+
-|  Magic Number |  Package Type | Serializer Type | Data Length |
-|    4 bytes    |    4 bytes    |     4 bytes     |   4 bytes   |
-+---------------+---------------+-----------------+-------------+
-|                          Data Bytes                           |
-|                   Length: ${Data Length}                      |
-+---------------------------------------------------------------+
-##
+/**
+|Magic Number |  Package Type | Serializer Type | Data Length |
+|   4 bytes    |    4 bytes    |     4 bytes     |   4 bytes   |
+|                          Data Bytes                          |
+|                   Length: ${Data Length}                     |
+**/
 序列化和反序列化都使用的JSON
 序列化将对象翻译成字节数组，反序列化将字节数组和对象翻译成对象 
 
@@ -44,29 +41,6 @@
 ### 5.JDK动态代理
 1. 利用了JDK动态代理实现了客户端的自动实现接口调用，简化了客户端操作
 2.动态代理主要是接口InvocaHandle和newProxyInstance()
-@Data
-public
-class ProxyNettyClient implements InvocationHandler {
-    private RpcClient rpcClient;
-
-    public ProxyNettyClient(RpcClient rpcClient){
-        this.rpcClient=rpcClient;
-    }
-    public  <T>T getProxy(Class<T> clazz){
-        return (T)Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, this);
-    }
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-       RpcRequest rpcRequest=RpcRequest.builder()
-               .InterfaceName(method.getDeclaringClass().getName())
-               .methodName(method.getName())
-               .clazz(method.getParameterTypes())
-               .params(args)
-               .build();
-        return rpcClient.sendRequest(rpcRequest);
-    }
-}
 
 -----
 
